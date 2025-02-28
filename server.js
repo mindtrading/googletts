@@ -1,6 +1,7 @@
 const express = require("express");
 const fs = require("fs");
 const axios = require("axios");
+const textToSpeech = require("@google-cloud/text-to-speech"); // Import TTS client
 const { GoogleAuth } = require("google-auth-library");
 const path = require("path");
 
@@ -13,17 +14,22 @@ const GOOGLE_CREDENTIALS = JSON.parse(process.env.GOOGLE_CREDENTIALS);
 
 const GOOGLE_TTS_API = "https://texttospeech.googleapis.com/v1/text:synthesize";
 
-const auth = new GoogleAuth({
-    credentials: GOOGLE_CREDENTIALS,
-    scopes: ["https://www.googleapis.com/auth/cloud-platform"]
-});
+
+
+
+
 
 async function generateSpeech(text, voice, speed) {
     //const client = await auth.getClient();
-    const client = new GoogleAuth({
+//     const client = new GoogleAuth({
+//     credentials: GOOGLE_CREDENTIALS,
+//     scopes: ["https://www.googleapis.com/auth/cloud-platform"]
+// }).getClient();
+    const auth = new GoogleAuth({
     credentials: GOOGLE_CREDENTIALS,
     scopes: ["https://www.googleapis.com/auth/cloud-platform"]
-}).getClient();
+});
+    const client = new textToSpeech.TextToSpeechClient({ auth }); // Fix: Properly initialize client
     
     const token = await client.getAccessToken();
 
