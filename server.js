@@ -8,7 +8,9 @@ const app = express();
 app.use(express.json());
 app.use(express.static(__dirname)); // Serve frontend files
 
-const GOOGLE_CREDENTIALS = JSON.parse(fs.readFileSync("google-key.json"));
+//const GOOGLE_CREDENTIALS = JSON.parse(fs.readFileSync("google-key.json"));
+const GOOGLE_CREDENTIALS = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+
 const GOOGLE_TTS_API = "https://texttospeech.googleapis.com/v1/text:synthesize";
 
 const auth = new GoogleAuth({
@@ -17,7 +19,12 @@ const auth = new GoogleAuth({
 });
 
 async function generateSpeech(text, voice, speed) {
-    const client = await auth.getClient();
+    //const client = await auth.getClient();
+    const client = new GoogleAuth({
+    credentials: GOOGLE_CREDENTIALS,
+    scopes: ["https://www.googleapis.com/auth/cloud-platform"]
+}).getClient();
+    
     const token = await client.getAccessToken();
 
     const response = await axios.post(GOOGLE_TTS_API, {
